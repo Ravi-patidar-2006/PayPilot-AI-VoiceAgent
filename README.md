@@ -1,104 +1,187 @@
-# PayPilot AI — PayPal Sandbox MVP
+# PayPilot AI Voice Agent
 
-A beginner-friendly starter project using React + Vite, FastAPI, SQLite, and the PayPal Orders v2 API.
+**An AI-powered voice assistant with PayPal Sandbox payment integration.**
+
+PayPilot AI is a web-based AI voice assistant designed to help users interact with an AI assistant through text and voice. It combines a React frontend, FastAPI backend, SQLite database, and PayPal Orders API Sandbox integration.
 
 ## Features
-- Create a PayPal Sandbox order from the dashboard.
-- Redirect to PayPal Sandbox Checkout for buyer approval.
-- Capture the order on the backend after returning from PayPal.
-- Store order records in SQLite and show recent payments.
-- Simple command parser for payment requests (starter intent parser, not an LLM yet).
-- Backend health/configuration endpoint.
 
-> Sandbox only. Do not use production credentials or real customer data. This MVP is not production-ready.
+- AI-powered assistant chat
+- Voice input using browser speech recognition
+- Female voice output using browser text-to-speech
+- English AI responses
+- PayPal Sandbox order creation
+- Payment capture with user confirmation
+- Transaction history
+- SQLite database integration
+- React + Vite frontend
+- FastAPI backend
 
-## Requirements
-- Python 3.10+
-- Node.js 20+ recommended
-- VS Code
-- A PayPal Developer account with a Sandbox REST app and Sandbox personal/buyer account
+## Tech Stack
 
-## 1. Configure PayPal
-1. Sign in at https://developer.paypal.com/
-2. Open Apps & Credentials.
-3. Select Sandbox.
-4. Create or open a REST API app.
-5. Copy the Sandbox Client ID and Secret.
-6. In `backend/.env`, set them. Never put the Secret in the frontend.
+| Technology | Purpose |
+|---|---|
+| React | Frontend UI |
+| Vite | Frontend development |
+| Python | Backend development |
+| FastAPI | REST API |
+| SQLite | Transaction storage |
+| PayPal Orders v2 API | Sandbox payment integration |
+| Browser Speech Recognition | Voice input |
+| Browser Speech Synthesis | Voice output |
 
-## 2. Start the backend
-Open a terminal in the project folder:
+## Project Structure
 
-### Windows PowerShell
-```powershell
-cd backend
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-Copy-Item .env.example .env
+```text
+PayPilot_AI_VoiceAgent/
+│
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   └── main.py
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── styles.css
+│   ├── index.html
+│   ├── package.json
+│   └── package-lock.json
+│
+├── .gitignore
+└── README.md
 ```
-Edit `backend/.env` and add your Sandbox credentials, then:
-```powershell
-uvicorn app.main:app --reload --port 8000
+
+## Installation and Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Ravi-patidar-2006/PayPilot-AI-VoiceAgent.git
+cd PayPilot-AI-VoiceAgent
 ```
 
-### macOS / Linux
+### 2. Backend setup
+
 ```bash
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-cp .env.example .env
+python -m venv .venv
 ```
-Edit `backend/.env` and add your Sandbox credentials, then:
+
+Activate the virtual environment on Windows:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
 ```bash
-uvicorn app.main:app --reload --port 8000
+pip install -r requirements.txt
 ```
 
-Backend docs: http://127.0.0.1:8000/docs
+### 3. Environment variables
 
-## 3. Start the frontend
-Open a second terminal at the project root:
+Create a `backend/.env` file and configure the required credentials:
+
+```env
+PAYPAL_CLIENT_ID=your_paypal_sandbox_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_sandbox_client_secret
+```
+
+Add any other API keys required by your configured AI provider.
+
+**Important:** Never upload `.env` files, API keys, or PayPal secrets to GitHub.
+
+### 4. Start the backend
+
+From the backend directory:
+
+```bash
+python -m uvicorn app.main:app --reload --port 8000
+```
+
+Backend URL:
+
+```text
+http://127.0.0.1:8000
+```
+
+API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### 5. Frontend setup
+
+Open a second terminal:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open the URL Vite prints, usually http://127.0.0.1:5173.
 
-## 4. Test the payment flow
-1. In the app, enter a product description and amount in USD.
-2. Click **Create Sandbox payment**.
-3. The app opens the PayPal Sandbox approval page.
-4. Sign in using a Sandbox Personal/Buyer account from the Developer Dashboard (not your real PayPal account).
-5. Approve the test payment.
-6. PayPal returns to the app; the backend captures the order and updates the transaction list.
+Open the local URL displayed by Vite, usually:
 
-The app creates orders using `CAPTURE` intent and captures only after the buyer returns from PayPal approval. Backend API responses are the source of truth for status.
+```text
+http://localhost:5173
+```
 
-## 5. Try the assistant command
-Enter something like:
-`Create a test payment for $25 for website design`
+## API Endpoints
 
-This starter parser extracts the amount and description and prepares the payment form. It is deterministic demo logic, not a connected LLM. Add an LLM provider later behind a server-side tool-calling layer; never let an LLM directly invent amounts or call capture without validation and user confirmation.
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/health` | Backend health check |
+| `POST /api/orders` | Create a PayPal order |
+| `POST /api/orders/{order_id}/capture` | Capture an order |
+| `GET /api/transactions` | Retrieve transactions |
+| `POST /api/assistant/query` | Assistant query |
+| `POST /api/assistant/chat` | AI assistant chat |
 
-## Troubleshooting
-- `PayPal credentials are not configured`: fill in `backend/.env`, restart FastAPI.
-- `401` from PayPal: confirm you copied Sandbox credentials, not Live credentials.
-- Checkout fails: use a Sandbox buyer account and ensure the Sandbox app is selected.
-- CORS error: keep Vite at port 5173 or update `allow_origins` in `backend/app/main.py`.
-- If the return flow doesn't capture: check the browser URL and backend terminal logs.
+## PayPal Sandbox Integration
 
-## Important security notes
-- Keep `.env` private and never commit it.
-- The frontend never receives the PayPal Secret.
-- This MVP does not include authentication, webhook signature verification, refund handling, tax calculation, or production-grade idempotency.
-- Before production: add authentication/authorization, verified webhooks, rate limiting, audit logs, idempotency, robust error handling, privacy/legal review, and PayPal account/currency eligibility checks.
+PayPilot AI integrates with the PayPal Orders v2 API in Sandbox mode.
 
+The payment workflow includes:
 
-## Added demo capabilities
-- Browser speech-to-text input where supported (Chrome recommended; microphone permission required).
-- Read-only summaries of the latest 50 transaction records stored by this PayPilot instance.
-- Explicit response that live PayPal account balance is not currently supported.
+1. Create a Sandbox order.
+2. Obtain the order details.
+3. Ask the user for payment confirmation.
+4. Capture the order after confirmation.
+5. Store transaction information.
 
-Important: this remains a Sandbox demo. The transaction summary is not a complete PayPal account ledger, and the balance query does not fetch live account balance. Never use production credentials or real customer data. Test payment actions in Sandbox only.
+**Note:** This project uses PayPal Sandbox for development and testing. It is not intended to process real payments in its current configuration.
+
+## Security
+
+- Keep API credentials in environment variables.
+- Never commit `.env` files.
+- Do not upload private credentials to GitHub.
+- Use PayPal Sandbox credentials for testing.
+- Require explicit user confirmation before payment capture.
+
+## Future Improvements
+
+- Improved multilingual voice interaction
+- Hands-free voice conversation
+- Better error handling
+- Enhanced transaction dashboard
+- Deployment and production configuration
+
+## Author
+
+**Ravi Nandan Kulmi**
+
+B.Tech Student | AI & ML
+
+## Repository
+
+[PayPilot AI Voice Agent on GitHub](https://github.com/Ravi-patidar-2006/PayPilot-AI-VoiceAgent)
+
+---
+
+*Built as an AI voice assistant project with PayPal Sandbox integration.*
